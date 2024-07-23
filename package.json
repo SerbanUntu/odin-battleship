@@ -1,0 +1,25 @@
+{
+	"name": "at-spaces",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"build": "webpack --config webpack.prod.js",
+		"dev": "webpack serve --open --config webpack.dev.js"
+	},
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@eslint/js": "^9.6.0",
+		"css-loader": "^7.1.2",
+		"eslint": "^9.6.0",
+		"globals": "^15.6.0",
+		"html-webpack-plugin": "^5.6.0",
+		"prettier": "3.3.2",
+		"style-loader": "^4.0.0",
+		"webpack": "^5.92.1",
+		"webpack-cli": "^5.1.4",
+		"webpack-dev-server": "^5.0.4",
+		"webpack-merge": "^5.10.0"
+	}
+}
