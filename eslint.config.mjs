@@ -26,4 +26,10 @@ export default [
 		},
 	},
 	pluginJs.configs.recommended,
+	{
+		plugins: ['jest'],
+		env: {
+			'jest/globals': true,
+		},
+	},
 ]
