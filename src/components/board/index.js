@@ -1,6 +1,6 @@
 import './index.css'
 import EmptyCell from '../../images/empty_cell.svg'
-import HitMark from '../../images/hit_mark.svg'
+import Gameboard from '../../lib/gameboard'
 
 export class ComponentBoard {
 	gameboard
@@ -23,8 +23,8 @@ export class ComponentBoard {
 				.join(''),
 		) // Keep only numeric characters and convert to Number type
 
-		for (let i = 0; i < this.gameboard.size; i++) {
-			for (let j = 0; j < this.gameboard.size; j++) {
+		for (let i = 0; i < Gameboard.size; i++) {
+			for (let j = 0; j < Gameboard.size; j++) {
 				const cell = document.createElement('div')
 				cell.dataset.row = i
 				cell.dataset.col = j

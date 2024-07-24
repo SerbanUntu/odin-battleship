@@ -3,7 +3,7 @@ import Gameboard from './gameboard'
 export default class Player {
 	name
 	isComputer
-	playerNumber
+	number
 	gameboard
 
 	constructor(name, isComputer, number) {
@@ -11,6 +11,12 @@ export default class Player {
 		this.isComputer = isComputer
 		this.number = number
 		this.gameboard = new Gameboard()
+	}
+}
+
+export class ComputerPlayer extends Player {
+	constructor() {
+		super('COMPUTER', true, 2)
 	}
 
 	generateGuess(board) {

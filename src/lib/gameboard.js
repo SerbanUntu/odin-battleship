@@ -1,4 +1,5 @@
-import { Direction } from './enums'
+import { Direction, GameStage } from './enums'
+import Game from './game'
 
 class GameboardSquare {
 	ship = null
@@ -6,14 +7,16 @@ class GameboardSquare {
 }
 
 export default class Gameboard {
+	static size = 10
+
+	//* Add component as child of logic instance
 	ships = []
-	size = 10
 	squares = []
 
 	constructor() {
-		for (let i = 0; i < this.size; i++) {
+		for (let i = 0; i < Gameboard.size; i++) {
 			const currentRow = []
-			for (let j = 0; j < this.size; j++) {
+			for (let j = 0; j < Gameboard.size; j++) {
 				currentRow.push(new GameboardSquare())
 			}
 			this.squares.push(currentRow)
@@ -40,8 +43,8 @@ export default class Gameboard {
 		let currentCol = col
 		let currentRow = row
 		for (let i = 0; i < ship.length; i++) {
-			if (currentCol < 0 || currentCol >= this.size) return false
-			if (currentRow < 0 || currentRow >= this.size) return false
+			if (currentCol < 0 || currentCol >= Gameboard.size) return false
+			if (currentRow < 0 || currentRow >= Gameboard.size) return false
 			if (this.squares[currentRow][currentCol].ship) return false
 			currentCol += colIterator
 			currentRow += rowIterator
@@ -63,8 +66,8 @@ export default class Gameboard {
 			Number(col) !== col ||
 			row < 0 ||
 			col < 0 ||
-			row >= this.size ||
-			col >= this.size
+			row >= Gameboard.size ||
+			col >= Gameboard.size
 		)
 			return null
 		if (!this.squares[row][col].ship || this.squares[row][col].hit) return false

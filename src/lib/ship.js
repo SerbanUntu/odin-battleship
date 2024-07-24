@@ -43,6 +43,6 @@ export class Submarine extends Ship {
 
 export class PatrolBoat extends Ship {
 	constructor() {
-		super('Patrol boat', 5)
+		super('Patrol boat', 2)
 	}
 }
