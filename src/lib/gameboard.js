@@ -1,5 +1,5 @@
-import { Direction, GameStage } from './enums'
-import Game from './game'
+import { ComponentBoard } from '../components/board'
+import { Direction } from './enums'
 
 class GameboardSquare {
 	ship = null
@@ -9,7 +9,7 @@ class GameboardSquare {
 export default class Gameboard {
 	static size = 10
 
-	//* Add component as child of logic instance
+	component = new ComponentBoard()
 	ships = []
 	squares = []
 
@@ -57,6 +57,7 @@ export default class Gameboard {
 			currentRow += rowIterator
 		}
 		this.ships.push(ship)
+		this.component.placeShip(ship.name, row, col, direction)
 		return true
 	}
 
@@ -67,13 +68,18 @@ export default class Gameboard {
 			row < 0 ||
 			col < 0 ||
 			row >= Gameboard.size ||
-			col >= Gameboard.size
+			col >= Gameboard.size ||
+			this.squares[row][col].hit
 		)
 			return null
-		if (!this.squares[row][col].ship || this.squares[row][col].hit) return false
+		this.squares[row][col].hit = true
+		if (!this.squares[row][col].ship) {
+			this.component.receiveAttack(row, col, true)
+			return false
+		}
 		const ship = this.squares[row][col].ship
 		ship.hit()
-		this.squares[row][col].hit = true
+		this.component.receiveAttack(row, col, false)
 		return ship
 	}
 

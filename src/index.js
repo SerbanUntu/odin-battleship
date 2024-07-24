@@ -1,14 +1,12 @@
 import './styles/reset.css'
 import './styles/main.css'
 import './styles/util.css'
-import Player from './lib/player'
-import { ComponentBoard } from './components/board'
+import Game from './lib/game'
 
-const playerOne = new Player('John', false, 1)
-const playerTwo = new Player('COMPUTER', true, 2)
+Game.setPlayers('John')
 
-const playerOneBoard = new ComponentBoard(playerOne.gameboard, false)
-const playerTwoBoard = new ComponentBoard(playerTwo.gameboard, true)
+document.body.appendChild(Game.getPlayerOne().gameboard.component.getComponent())
+document.body.appendChild(Game.getPlayerTwo().gameboard.component.getComponent())
 
-document.body.appendChild(playerOneBoard.getComponent())
-document.body.appendChild(playerTwoBoard.getComponent())
+Game.getPlayerTwo().gameboard.component.setHidden(true)
+Game.autoPlace()

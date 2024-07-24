@@ -37,7 +37,7 @@ test('Attacking twice', () => {
 	const testShip = new Ship('Destroyer', 3)
 	testGameboard.placeShip(testShip, 3, 3, Direction.NORTH)
 	expect(testGameboard.receiveAttack(3, 3)).toBe(testShip)
-	expect(testGameboard.receiveAttack(3, 3)).toBe(false)
+	expect(testGameboard.receiveAttack(3, 3)).toBe(null)
 })
 
 test('Invalid hit coordinates', () => {

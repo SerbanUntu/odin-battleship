@@ -14,9 +14,37 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		* {
+		> * {
 			position: absolute;
 		}
+	}
+
+	.ship-image {
+		top: 2px;
+		left: 2px;
+		max-width: 9999px;
+		z-index: 100;
+	}
+
+	.ship-image.facing-north {
+		transform: translate(-50%) rotate(-90deg) translate(-50%);
+		top: -12px;
+		left: 16px;
+	}
+
+	.ship-image.facing-south {
+		transform: translate(-50%) rotate(-90deg) translate(50%);
+		top: 16px;
+		left: 16px;
+	}
+	
+	.ship-image.facing-east {
+		transform: translate(-100%);
+		left: 30px;
+	}
+
+	.mark {
+		z-index: 200;
 	}
 
 }
@@ -27,7 +55,7 @@
 		cursor: pointer;
 	}
 
-	.ship { /*! Use this class name */
+	.ship-image {
 		display: none;
 	}
 }

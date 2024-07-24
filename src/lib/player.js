@@ -19,14 +19,10 @@ export class ComputerPlayer extends Player {
 		super('COMPUTER', true, 2)
 	}
 
-	generateGuess(board) {
-		let row
-		let col
-		while (true) {
-			row = Math.floor(Math.random() * 9)
-			col = Math.floor(Math.random() * 9)
-			if (board.receiveAttack(row, col)) break
-		}
+	generateGuess() {
+		//TODO Remove randomness after 10 tries, implement smart algorithm
+		let row = Math.floor(Math.random() * 10)
+		let col = Math.floor(Math.random() * 10)
 		return [row, col]
 	}
 }

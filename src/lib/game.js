@@ -80,4 +80,11 @@ export default class Game {
 		//TODO if(Game.areAllShipsSunk(true, true)) Game.stage = GameStage.FINISHED
 		return result
 	}
+
+	static attackFromComputer() {
+		if (!Game.getPlayerTwo().isComputer) return
+		while (Game.turnOf !== 1) {
+			Game.makeAttack(2, ...Game.getPlayerTwo().generateGuess())
+		}
+	}
 }
