@@ -1,0 +1,38 @@
+.board {
+	padding: 0.75rem;
+	border: 0.5rem solid var(--cell-bg);
+	background: var(--board-bg);
+	display: grid;
+	grid-template-columns: repeat(10, var(--cell-size));
+	grid-template-rows: repeat(10, var(--cell-size));
+	gap: var(--grid-gap);
+	width: fit-content;
+	border-radius: 1rem;
+
+	.cell {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		* {
+			position: absolute;
+		}
+	}
+
+}
+
+.hidden.board {
+	.cell:hover { 
+		opacity: 0.75;
+		cursor: pointer;
+	}
+
+	.ship { /*! Use this class name */
+		display: none;
+	}
+}
+
+.active.board {
+	pointer-events: none;
+	user-select: none;
+}
