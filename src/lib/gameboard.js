@@ -57,7 +57,10 @@ export default class Gameboard {
 			currentRow += rowIterator
 		}
 		this.ships.push(ship)
-		this.component.placeShip(ship.name, row, col, direction)
+		if (process === undefined) {
+			//? Only run in browser
+			this.component.placeShip(ship.name, row, col, direction)
+		}
 		return true
 	}
 
@@ -74,12 +77,18 @@ export default class Gameboard {
 			return null
 		this.squares[row][col].hit = true
 		if (!this.squares[row][col].ship) {
-			this.component.receiveAttack(row, col, true)
+			if (process === undefined) {
+				//? Only run in browser
+				this.component.receiveAttack(row, col, true)
+			}
 			return false
 		}
 		const ship = this.squares[row][col].ship
 		ship.hit()
-		this.component.receiveAttack(row, col, false)
+		if (process === undefined) {
+			//? Only run in browser
+			this.component.receiveAttack(row, col, false)
+		}
 		return ship
 	}
 
