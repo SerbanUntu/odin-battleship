@@ -6,8 +6,8 @@ export class Direction {
 }
 
 export class GameStage {
-	static CONFIG = Symbol('GameStage.CONFIG')
-	static SELECTION = Symbol('GameStage.SELECTION')
-	static BATTLE = Symbol('GameStage.BATTLE')
-	static FINISHED = Symbol('GameStage.FINISHED')
+	static CONFIG = Symbol('GameStage.CONFIG') // setPlayers
+	static SELECTION = Symbol('GameStage.SELECTION') // placeShip, autoPlace, randomPlace
+	static BATTLE = Symbol('GameStage.BATTLE') // makeAttack, attackFromComputer
+	static FINISHED = Symbol('GameStage.FINISHED') // init
 }

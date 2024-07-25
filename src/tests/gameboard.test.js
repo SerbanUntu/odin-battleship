@@ -27,6 +27,16 @@ test('Overlapping ships', () => {
 	expect(testGameboard.placeShip(testShip2, 1, 5, Direction.NORTH)).toBe(false)
 })
 
+test('Placing more than 5 ships', () => {
+	const testGameboard = new Gameboard()
+	expect(testGameboard.placeShip(new Ship('Civilian', 1), 0, 0, Direction.EAST)).toBe(true)
+	expect(testGameboard.placeShip(new Ship('Civilian', 1), 1, 0, Direction.EAST)).toBe(true)
+	expect(testGameboard.placeShip(new Ship('Civilian', 1), 2, 0, Direction.EAST)).toBe(true)
+	expect(testGameboard.placeShip(new Ship('Civilian', 1), 3, 0, Direction.EAST)).toBe(true)
+	expect(testGameboard.placeShip(new Ship('Civilian', 1), 4, 0, Direction.EAST)).toBe(true)
+	expect(testGameboard.placeShip(new Ship('Civilian', 1), 5, 0, Direction.EAST)).toBe(false)
+})
+
 test('Missing a hit', () => {
 	const testGameboard = new Gameboard()
 	expect(testGameboard.receiveAttack(0, 1)).toBe(false)
@@ -37,7 +47,7 @@ test('Attacking twice', () => {
 	const testShip = new Ship('Destroyer', 3)
 	testGameboard.placeShip(testShip, 3, 3, Direction.NORTH)
 	expect(testGameboard.receiveAttack(3, 3)).toBe(testShip)
-	expect(testGameboard.receiveAttack(3, 3)).toBe(null)
+	expect(testGameboard.receiveAttack(3, 3)).toBeNull()
 })
 
 test('Invalid hit coordinates', () => {

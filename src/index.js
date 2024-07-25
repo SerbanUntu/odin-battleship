@@ -9,4 +9,5 @@ document.body.appendChild(Game.getPlayerOne().gameboard.component.getComponent()
 document.body.appendChild(Game.getPlayerTwo().gameboard.component.getComponent())
 
 Game.getPlayerTwo().gameboard.component.setHidden(true)
-Game.autoPlace()
+Game.autoPlace(true, false)
+Game.randomPlace(false, true)
