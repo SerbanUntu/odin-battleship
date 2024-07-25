@@ -2,7 +2,6 @@ import './index.css'
 import Gameboard from '../../lib/gameboard'
 import { Direction } from '../../lib/enums'
 
-import EmptyCell from '../../images/empty_cell.svg'
 import CruiserTexture from '../../images/cruiser.svg'
 import BattleshipTexture from '../../images/battleship.svg'
 import DestroyerTexture from '../../images/destroyer.svg'
@@ -41,13 +40,11 @@ export class ComponentBoard {
 
 		for (let i = 0; i < Gameboard.size; i++) {
 			for (let j = 0; j < Gameboard.size; j++) {
-				const cell = document.createElement('div')
+				const cell = document.createElement('button')
 				cell.dataset.row = i
 				cell.dataset.col = j
 				cell.classList.add('cell')
-				const image = new Image(cellSize, cellSize)
-				image.src = EmptyCell
-				cell.appendChild(image)
+				cell.setAttribute('tabindex', '-1')
 				cell.addEventListener('click', e => {
 					e.preventDefault()
 					Game.makeAttack(1, i, j)

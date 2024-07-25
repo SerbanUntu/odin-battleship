@@ -28,6 +28,22 @@ body {
 	color: var(--text-primary);
 }
 
+label {
+	font-size: 2rem;
+}
+
+input {
+	min-width: 300px;
+	background: none;
+	font-size: 2rem;
+	border: 2px solid var(--app-bg);
+	color: var(--app-bg);
+
+	&:focus {
+		outline: 2px solid white;
+	}
+}
+
 .board-section {
 	position: relative;
 	display: flex;
@@ -39,4 +55,5 @@ body {
 	align-self: center;
 	font-size: 3rem;
 	font-weight: 400;
+	display: inline;
 }

@@ -11,6 +11,10 @@
 
 	.cell {
 		position: relative;
+		border: none;
+		outline: none;
+		padding: 0;
+		background: url(../../images/empty_cell.svg);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -45,6 +49,8 @@
 
 	.mark {
 		z-index: 200;
+		pointer-events: none;
+		user-select: none;
 	}
 
 }

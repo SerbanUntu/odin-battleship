@@ -1,0 +1,60 @@
+.interruption-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	flex-direction: column;
+	align-items: center;
+	backdrop-filter: blur(0.25rem);
+	z-index: 300;
+}
+
+.interruption {
+	position: absolute;
+	width: 100%;
+	max-width: 100%;
+	top: 50%;
+	transform: translateY(-50%);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem;
+	border: none;
+	gap: 2rem;
+	background: var(--text-secondary);
+	color: inherit;
+
+	.interruption-name {
+		font-size: 4rem;
+	}
+
+	.buttons {
+		display: flex;
+		gap: 2rem;
+	}
+
+	button.decision {
+		border: none;
+		background: var(--app-bg);
+		cursor: pointer;
+		border-radius: 0.5rem;
+		font-size: 2rem;
+		padding: 0.5rem 2rem;
+		color: var(--text-secondary);
+
+		&:hover {
+			background: var(--board-bg);
+		}
+
+		&:focus {
+			outline: 4px solid white;
+		}
+	}
+
+	.input-section {
+		display: flex;
+		flex-direction: column;
+	}
+}
