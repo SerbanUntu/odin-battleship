@@ -11,3 +11,11 @@ export class GameStage {
 	static BATTLE = Symbol('GameStage.BATTLE') // makeAttack, attackFromComputer
 	static FINISHED = Symbol('GameStage.FINISHED') // init
 }
+
+export class MessageType {
+	static EMPTY = Symbol('MessageType.EMPTY')
+	static DEFAULT = Symbol('MessageType.DEFAULT')
+	static HIT = Symbol('MessageType.HIT')
+	static IMPORTANT = Symbol('MessageType.IMPORTANT')
+	static WIN = Symbol('MessageType.WIN')
+}

@@ -14,12 +14,12 @@ import Game from '../../lib/game'
 
 export class ComponentBoard {
 	#hidden = false
-	domNode = null
+	#domNode = null
 
 	setHidden(hidden) {
 		this.hidden = hidden
-		this.domNode.classList.remove('hidden', 'active')
-		this.domNode.classList.add(this.hidden ? 'hidden' : 'active')
+		this.#domNode.classList.remove('hidden', 'active')
+		this.#domNode.classList.add(this.hidden ? 'hidden' : 'active')
 	}
 
 	getHidden() {
@@ -28,7 +28,7 @@ export class ComponentBoard {
 
 	getComponent() {
 		const component = document.createElement('div')
-		this.domNode = component
+		this.#domNode = component
 		component.classList.add('board')
 		component.classList.add(this.hidden ? 'hidden' : 'active')
 		let cellSize = getComputedStyle(document.body).getPropertyValue('--cell-size')
@@ -61,7 +61,7 @@ export class ComponentBoard {
 	}
 
 	placeShip(shipName, row, col, direction) {
-		const cell = this.domNode.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`)
+		const cell = this.#domNode.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`)
 		const shipImage = new Image()
 		shipImage.classList.add('ship-image')
 		switch (direction) {
@@ -109,7 +109,7 @@ export class ComponentBoard {
 	}
 
 	receiveAttack(row, col, miss) {
-		const cell = this.domNode.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`)
+		const cell = this.#domNode.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`)
 		let mark
 		if (miss) {
 			mark = new Image(12, 12)

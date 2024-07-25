@@ -1,5 +1,6 @@
 import { ComponentBoard } from '../components/board'
 import { Direction } from './enums'
+import { runInBrowser } from './helper'
 
 class GameboardSquare {
 	ship = null
@@ -58,11 +59,9 @@ export default class Gameboard {
 			currentRow += rowIterator
 		}
 		this.ships.push(ship)
-		try {
-			process
-		} catch {
+		runInBrowser(() => {
 			this.component.placeShip(ship.name, row, col, direction)
-		}
+		})
 		return true
 	}
 
@@ -79,20 +78,16 @@ export default class Gameboard {
 			return null
 		this.squares[row][col].hit = true
 		if (!this.squares[row][col].ship) {
-			try {
-				process
-			} catch {
+			runInBrowser(() => {
 				this.component.receiveAttack(row, col, true)
-			}
+			})
 			return false
 		}
 		const ship = this.squares[row][col].ship
 		ship.hit()
-		try {
-			process
-		} catch {
+		runInBrowser(() => {
 			this.component.receiveAttack(row, col, false)
-		}
+		})
 		return ship
 	}
 

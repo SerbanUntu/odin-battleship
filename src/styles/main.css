@@ -5,6 +5,12 @@
 	--app-bg: hsl(0deg 0% 10%);
 	--board-bg: hsl(0deg 0% 15%);
 	--cell-bg: hsl(0deg 0% 30%);
+	--text-secondary: hsl(0deg 0% 50%);
+	--text-primary: hsl(0deg 0% 90%);
+
+	--red: hsl(0deg 90% 60%);
+	--dark-red: hsl(0deg 70% 40%);
+	--neon-green: hsl(100deg 100% 70%);
 }
 
 body {
@@ -16,4 +22,21 @@ body {
 	padding: 0 20vw;
 	align-items: center;
 	justify-content: space-between;
+	font-family: 'Pixelify Sans', sans-serif;
+	font-style: normal;
+	font-weight: 400;
+	color: var(--text-primary);
+}
+
+.board-section {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+.board-owner {
+	align-self: center;
+	font-size: 3rem;
+	font-weight: 400;
 }

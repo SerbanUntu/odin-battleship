@@ -1,0 +1,20 @@
+.message {
+	padding: 0 2rem;
+	position: absolute;
+	bottom: 0;
+	transform: translateY(100%) translateY(1rem);
+	font-size: 1.5rem;
+	color: var(--text-secondary);
+
+	&.hit {
+		color: var(--dark-red);
+	}
+
+	&.important {
+		color: var(--red);
+	}
+
+	&.win {
+		color: var(--neon-green);
+	}
+}

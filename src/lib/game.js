@@ -2,6 +2,8 @@ import { GameStage } from './enums'
 import Player, { ComputerPlayer } from './player'
 import { Carrier, Battleship, Destroyer, Submarine, PatrolBoat } from './ship'
 import { Direction } from './enums'
+import { runInBrowser, runInNode } from './helper'
+import ComponentMessage from '../components/message'
 
 export default class Game {
 	static #stage = GameStage.CONFIG
@@ -33,11 +35,10 @@ export default class Game {
 	}
 
 	static initWithOverride() {
-		try {
-			process
+		runInNode(() => {
 			Game.#stage = GameStage.FINISHED
-			return Game.init()
-		} catch {}
+		})
+		return Game.init()
 	}
 
 	static setPlayers(playerOneName, againstComputer = true, playerTwoName = 'COMPUTER') {
@@ -159,11 +160,42 @@ export default class Game {
 		const dealingPlayer = playerNumber === 1 ? Game.getPlayerOne() : Game.getPlayerTwo()
 		let result
 		result = receivingPlayer.gameboard.receiveAttack(row, col)
-		if (result !== null) Game.turnOf = otherPlayerNumber
+		if (result === null) return null
+		Game.turnOf = otherPlayerNumber
 		if (receivingPlayer.gameboard.areAllSunk()) {
 			Game.#stage = GameStage.FINISHED
 			Game.winner = dealingPlayer
 		}
+		runInBrowser(() => {
+			let messageComponent
+			let otherMessageComponent
+			if (otherPlayerNumber === 1) {
+				messageComponent = ComponentMessage.leftMessage
+				otherMessageComponent = ComponentMessage.rightMessage
+			} else {
+				messageComponent = ComponentMessage.rightMessage
+				otherMessageComponent = ComponentMessage.leftMessage
+			}
+			if (result === false) {
+				messageComponent.updateMiss()
+			} else {
+				if (receivingPlayer.gameboard.areAllSunk()) {
+					messageComponent.updateWin(dealingPlayer.isComputer)
+					otherMessageComponent.updateLoss(receivingPlayer.isComputer)
+				} else {
+					const receivingShip = receivingPlayer.gameboard.squares[row][col].ship
+					if (receivingShip.isSunk()) {
+						messageComponent.updateSink(
+							receivingPlayer.isComputer,
+							dealingPlayer.name,
+							receivingShip.name,
+						)
+					} else {
+						messageComponent.updateHit()
+					}
+				}
+			}
+		})
 		return result
 	}
 
