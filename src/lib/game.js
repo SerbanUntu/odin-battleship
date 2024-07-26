@@ -5,10 +5,14 @@ import { Direction } from './enums'
 import { runInBrowser, runInNode } from './helper'
 import ComponentMessage from '../components/message'
 
+let dispatchedFirstPlacingFinish = false
+let dispatchedGameEnd = false
+
 export default class Game {
 	static #stage = GameStage.CONFIG
 	static #playerOne = null
 	static #playerTwo = null
+	static #currentlyPlacingPlayer = null
 	static winner = null
 	static turnOf = 1
 
@@ -29,6 +33,8 @@ export default class Game {
 		Game.#stage = GameStage.CONFIG
 		Game.#playerOne = null
 		Game.#playerTwo = null
+		Game.#currentlyPlacingPlayer = null
+		Game.againstComputer = null
 		Game.winner = null
 		Game.turnOf = 1
 		return true
@@ -46,6 +52,7 @@ export default class Game {
 		Game.#playerOne = new Player(playerOneName, false, 1)
 		Game.#playerTwo = againstComputer ? new ComputerPlayer() : new Player(playerTwoName, false, 2)
 		Game.#stage = GameStage.SELECTION
+		Game.#currentlyPlacingPlayer = Game.getPlayerOne()
 		return true
 	}
 
@@ -61,7 +68,12 @@ export default class Game {
 		return Game.#stage
 	}
 
+	static getCurrentlyPlacingPlayer() {
+		return Game.#currentlyPlacingPlayer
+	}
+
 	static placeShip(playerNumber, ship, row, col, direction) {
+		if (Game.#currentlyPlacingPlayer.number !== playerNumber) return false
 		if (Game.#stage !== GameStage.SELECTION) return false
 		const player = playerNumber === 1 ? Game.getPlayerOne() : Game.getPlayerTwo()
 		if (
@@ -83,6 +95,15 @@ export default class Game {
 		)
 			return false
 		const result = player.gameboard.placeShip(ship, row, col, direction)
+		if (Game.#currentlyPlacingPlayer.gameboard.ships.length === 5) {
+			Game.#currentlyPlacingPlayer = Game.getPlayerTwo()
+			runInBrowser(() => {
+				if (!dispatchedFirstPlacingFinish) {
+					dispatchedFirstPlacingFinish = true
+					window.dispatchEvent(new Event('first-placing-finish'))
+				}
+			})
+		}
 		if (Game.areAllShipsPlaced()) Game.#stage = GameStage.BATTLE
 		return result
 	}
@@ -182,6 +203,10 @@ export default class Game {
 				if (receivingPlayer.gameboard.areAllSunk()) {
 					messageComponent.updateWin(dealingPlayer.isComputer)
 					otherMessageComponent.updateLoss(receivingPlayer.isComputer)
+					if (!dispatchedGameEnd) {
+						dispatchedGameEnd = true
+						window.dispatchEvent(new Event('game-end'))
+					}
 				} else {
 					const receivingShip = receivingPlayer.gameboard.squares[row][col].ship
 					if (receivingShip.isSunk()) {

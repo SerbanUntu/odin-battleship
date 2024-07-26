@@ -60,7 +60,7 @@ export default class Gameboard {
 		}
 		this.ships.push(ship)
 		runInBrowser(() => {
-			this.component.placeShip(ship.name, row, col, direction)
+			this.component.renderShip(ship, row, col, direction)
 		})
 		return true
 	}

@@ -28,6 +28,7 @@
 		left: 2px;
 		max-width: 9999px;
 		z-index: 100;
+		pointer-events: none;
 	}
 
 	.ship-image.facing-north {
@@ -63,6 +64,16 @@
 
 	.ship-image {
 		display: none;
+	}
+}
+
+.board-section:has(.placing.board) {
+	flex: 1;
+}
+
+.placing.board {
+	.cell:hover {
+		cursor: pointer;
 	}
 }
 

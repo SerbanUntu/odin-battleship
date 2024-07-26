@@ -10,13 +10,16 @@ import {
 	NamingInterruptionContainer,
 	ClosingInterruptionContainer,
 } from './components/interruption'
+import ComponentShipSelectionMenu from './components/ship-selection'
 
 const leftSection = document.querySelector('#left-section')
 const rightSection = document.querySelector('#right-section')
 const leftBoardOwner = leftSection.querySelector('.board-owner')
 const rightBoardOwner = rightSection.querySelector('.board-owner')
+let againstComputer = null
 let leftBoard
 let rightBoard
+let selectionMenu
 
 const openingInterruptionContainer = OpeningInterruptionContainer.getComponent()
 const openingInterruption = openingInterruptionContainer.querySelector('dialog')
@@ -45,6 +48,7 @@ showOpening()
 function showOpening() {
 	showInterruption(openingInterruptionContainer)
 	againstComputerButton.addEventListener('click', e => {
+		againstComputer = true
 		e.preventDefault()
 		hideInterruption(openingInterruptionContainer)
 		namesSetup()
@@ -54,38 +58,50 @@ function showOpening() {
 function namesSetup() {
 	showInterruption(namingInterruptionContainer)
 	namesForm.reset()
-
-	namesForm.addEventListener('submit', e => {
-		e.preventDefault()
-		Game.setPlayers(playerOneNameInput.value)
-		hideInterruption(namingInterruptionContainer)
-		playGame()
-	})
+	if (againstComputer) {
+		namesForm.addEventListener('submit', e => {
+			e.preventDefault()
+			Game.setPlayers(playerOneNameInput.value)
+			hideInterruption(namingInterruptionContainer)
+			placeShipsFirst()
+		})
+	}
 }
 
-function playGame() {
+function placeShipsFirst() {
+	leftBoardOwner.style.display = 'block'
+	rightBoardOwner.style.display = 'none'
+	rightSection.style.display = 'none'
+	leftBoard = Game.getPlayerOne().gameboard.component.getComponent()
+	leftBoard.classList.add('placing')
+	leftSection.appendChild(leftBoard)
 	leftBoardOwner.textContent = Game.getPlayerOne().name
 	rightBoardOwner.textContent = Game.getPlayerTwo().name
-
-	leftBoard = Game.getPlayerOne().gameboard.component.getComponent()
-	rightBoard = Game.getPlayerTwo().gameboard.component.getComponent()
-
-	leftSection.appendChild(leftBoard)
-	rightSection.appendChild(rightBoard)
-
-	Game.getPlayerTwo().gameboard.component.setHidden(true)
-	Game.autoPlace()
-
-	const checkEnd = setInterval(() => {
-		//TODO Improve this
-		if (Game.winner !== null) {
-			setTimeout(() => {
-				endGame()
-				clearInterval(checkEnd)
-			}, 1000)
-		}
-	}, 1000)
+	selectionMenu = ComponentShipSelectionMenu.getComponent()
+	leftSection.appendChild(selectionMenu)
 }
+
+window.addEventListener('first-placing-finish', () => {
+	placeShipsSecond()
+})
+
+function placeShipsSecond() {
+	if (againstComputer) {
+		leftBoard.classList.remove('placing')
+		selectionMenu.style.display = 'none'
+		rightBoard = Game.getPlayerTwo().gameboard.component.getComponent()
+		Game.getPlayerOne().gameboard.component.setHidden(false)
+		Game.getPlayerTwo().gameboard.component.setHidden(true)
+		Game.randomPlace(false, true)
+		rightSection.style.display = 'flex'
+		rightBoardOwner.style.display = 'block'
+		rightSection.appendChild(rightBoard)
+	}
+}
+
+window.addEventListener('game-end', () => {
+	setTimeout(() => endGame(), 1000)
+})
 
 function endGame() {
 	showInterruption(closingInterruptionContainer)

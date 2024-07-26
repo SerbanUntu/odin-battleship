@@ -48,12 +48,17 @@ input {
 	position: relative;
 	display: flex;
 	flex-direction: column;
+	align-items: center;
 	gap: 2rem;
 }
 
 .board-owner {
-	align-self: center;
 	font-size: 3rem;
 	font-weight: 400;
 	display: inline;
+}
+
+.ghost {
+	opacity: 0.5;
+	pointer-events: none;
 }

@@ -1,19 +1,38 @@
 import './index.css'
 import Gameboard from '../../lib/gameboard'
-import { Direction } from '../../lib/enums'
+import { Direction, GameStage } from '../../lib/enums'
+import ComponentShip from '../ship'
 
-import CruiserTexture from '../../images/cruiser.svg'
-import BattleshipTexture from '../../images/battleship.svg'
-import DestroyerTexture from '../../images/destroyer.svg'
-import SubmarineTexture from '../../images/submarine.svg'
-import PatrolBoatTexture from '../../images/patrol_boat.svg'
 import MissMark from '../../images/miss_mark.svg'
 import HitMark from '../../images/hit_mark.svg'
 import Game from '../../lib/game'
+import ComponentShipSelectionMenu from '../ship-selection'
+import { Carrier, Battleship, Destroyer, Submarine, PatrolBoat } from '../../lib/ship'
 
 export class ComponentBoard {
 	#hidden = false
 	#domNode = null
+
+	static updateGhost() {
+		const ghosts = document.querySelectorAll('.ghost')
+		ghosts.forEach(ghost => {
+			ghost.classList.remove('facing-west', 'facing-east', 'facing-north', 'facing-south')
+			switch (ComponentShipSelectionMenu.currentDirection) {
+				case Direction.EAST:
+					ghost.classList.add('facing-east')
+					break
+				case Direction.WEST:
+					ghost.classList.add('facing-west')
+					break
+				case Direction.SOUTH:
+					ghost.classList.add('facing-south')
+					break
+				case Direction.NORTH:
+					ghost.classList.add('facing-north')
+					break
+			}
+		})
+	}
 
 	setHidden(hidden) {
 		this.hidden = hidden
@@ -29,7 +48,6 @@ export class ComponentBoard {
 		const component = document.createElement('div')
 		this.#domNode = component
 		component.classList.add('board')
-		component.classList.add(this.hidden ? 'hidden' : 'active')
 		let cellSize = getComputedStyle(document.body).getPropertyValue('--cell-size')
 		cellSize = Number(
 			cellSize
@@ -45,11 +63,58 @@ export class ComponentBoard {
 				cell.dataset.col = j
 				cell.classList.add('cell')
 				cell.setAttribute('tabindex', '-1')
+
+				cell.addEventListener('mouseenter', e => {
+					e.preventDefault()
+					if (Game.getStage() !== GameStage.SELECTION) return
+					if (!ComponentShipSelectionMenu.currentShip) return
+					this.renderShip(
+						ComponentShipSelectionMenu.currentShip,
+						i,
+						j,
+						ComponentShipSelectionMenu.currentDirection,
+						true,
+					)
+				})
+
 				cell.addEventListener('click', e => {
 					e.preventDefault()
-					Game.makeAttack(1, i, j)
-					if (Game.getPlayerTwo().isComputer) setTimeout(() => Game.attackFromComputer(), 500)
+					if (Game.getStage() === GameStage.BATTLE) {
+						Game.makeAttack(1, i, j)
+						if (Game.getPlayerTwo().isComputer) setTimeout(() => Game.attackFromComputer(), 500)
+					} else if (Game.getStage() === GameStage.SELECTION) {
+						let newShip
+						switch (ComponentShipSelectionMenu.currentShip.name) {
+							case 'Carrier':
+								newShip = new Carrier()
+								break
+							case 'Battleship':
+								newShip = new Battleship()
+								break
+							case 'Destroyer':
+								newShip = new Destroyer()
+								break
+							case 'Submarine':
+								newShip = new Submarine()
+								break
+							case 'Patrol boat':
+								newShip = new PatrolBoat()
+								break
+						}
+						const result = Game.placeShip(
+							Game.getCurrentlyPlacingPlayer().number,
+							newShip,
+							i,
+							j,
+							ComponentShipSelectionMenu.currentDirection,
+						)
+						if (result) {
+							ComponentShipSelectionMenu.disableButton(ComponentShipSelectionMenu.currentShip.name)
+							ComponentShipSelectionMenu.currentShip = null
+						}
+					}
 				})
+
 				component.appendChild(cell)
 			}
 		}
@@ -57,50 +122,13 @@ export class ComponentBoard {
 		return component
 	}
 
-	placeShip(shipName, row, col, direction) {
+	renderShip(ship, row, col, direction, ghost = false) {
 		const cell = this.#domNode.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`)
-		const shipImage = new Image()
-		shipImage.classList.add('ship-image')
-		switch (direction) {
-			case Direction.EAST:
-				shipImage.classList.add('facing-east')
-				break
-			case Direction.WEST:
-				shipImage.classList.add('facing-west')
-				break
-			case Direction.SOUTH:
-				shipImage.classList.add('facing-south')
-				break
-			case Direction.NORTH:
-				shipImage.classList.add('facing-north')
-				break
-		}
-		switch (shipName) {
-			default:
-				shipImage.src = CruiserTexture
-				shipImage.width = 172
-				shipImage.height = 28
-				break
-			case 'Battleship':
-				shipImage.src = BattleshipTexture
-				shipImage.width = 136
-				shipImage.height = 28
-				break
-			case 'Destroyer':
-				shipImage.src = DestroyerTexture
-				shipImage.width = 100
-				shipImage.height = 28
-				break
-			case 'Submarine':
-				shipImage.src = SubmarineTexture
-				shipImage.width = 100
-				shipImage.height = 28
-				break
-			case 'Patrol boat':
-				shipImage.src = PatrolBoatTexture
-				shipImage.width = 64
-				shipImage.height = 28
-				break
+		const shipImage = new ComponentShip(ship, direction).getComponent()
+		if (ghost) {
+			const ghosts = document.querySelectorAll('.ghost')
+			ghosts.forEach(ghost => ghost.remove())
+			shipImage.classList.add('ghost')
 		}
 		cell.appendChild(shipImage)
 	}
