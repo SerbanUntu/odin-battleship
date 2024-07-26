@@ -19,3 +19,10 @@ export class MessageType {
 	static IMPORTANT = Symbol('MessageType.IMPORTANT')
 	static WIN = Symbol('MessageType.WIN')
 }
+
+export class BoardDisplay {
+	static NONE = Symbol('BoardDisplay.NONE')
+	static PLACING = Symbol('BoardDisplay.PLACING')
+	static NO_SHIPS = Symbol('BoardDisplay.NO_SHIPS')
+	static ALL = Symbol('BoardDisplay.ACTIVE')
+}

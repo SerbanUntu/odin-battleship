@@ -1,6 +1,6 @@
 import './index.css'
 import Gameboard from '../../lib/gameboard'
-import { Direction, GameStage } from '../../lib/enums'
+import { BoardDisplay, Direction, GameStage } from '../../lib/enums'
 import ComponentShip from '../ship'
 
 import MissMark from '../../images/miss_mark.svg'
@@ -8,9 +8,14 @@ import HitMark from '../../images/hit_mark.svg'
 import Game from '../../lib/game'
 import ComponentShipSelectionMenu from '../ship-selection'
 import { Carrier, Battleship, Destroyer, Submarine, PatrolBoat } from '../../lib/ship'
+import {
+	hideInterruption,
+	PassDeviceInterruptionContainer,
+	showInterruption,
+} from '../interruption'
 
 export class ComponentBoard {
-	#hidden = false
+	#display = false
 	#domNode = null
 
 	static updateGhost() {
@@ -34,10 +39,43 @@ export class ComponentBoard {
 		})
 	}
 
-	setHidden(hidden) {
-		this.hidden = hidden
-		this.#domNode.classList.remove('hidden', 'active')
-		this.#domNode.classList.add(this.hidden ? 'hidden' : 'active')
+	static switchBoards() {
+		const leftBoard = Game.getPlayerOne().gameboard.component
+		const rightBoard = Game.getPlayerTwo().gameboard.component
+		const interruption = document.querySelector('.pass-device-interruption-container')
+		PassDeviceInterruptionContainer.updateName(
+			Game.turnOf === 1 ? Game.getPlayerOne().name : Game.getPlayerTwo().name,
+		)
+		showInterruption(interruption)
+		interruption.querySelector('.continue').onclick = e => {
+			e.preventDefault()
+			hideInterruption(interruption)
+			if (leftBoard.#domNode.classList.contains('active')) {
+				leftBoard.setDisplay(BoardDisplay.NO_SHIPS)
+				rightBoard.setDisplay(BoardDisplay.ACTIVE)
+			} else {
+				rightBoard.setDisplay(BoardDisplay.NO_SHIPS)
+				leftBoard.setDisplay(BoardDisplay.ACTIVE)
+			}
+		}
+	}
+
+	setDisplay(display) {
+		this.#display = display
+		this.#domNode.classList.remove('no-ships', 'placing', 'active', 'hidden')
+		switch (display) {
+			case BoardDisplay.NONE:
+				this.#domNode.classList.add('hidden')
+				break
+			case BoardDisplay.NO_SHIPS:
+				this.#domNode.classList.add('no-ships')
+				break
+			case BoardDisplay.PLACING:
+				this.#domNode.classList.add('placing')
+				break
+			case BoardDisplay.ACTIVE:
+				this.#domNode.classList.add('active')
+		}
 	}
 
 	getHidden() {
@@ -80,9 +118,22 @@ export class ComponentBoard {
 				cell.addEventListener('click', e => {
 					e.preventDefault()
 					if (Game.getStage() === GameStage.BATTLE) {
-						Game.makeAttack(1, i, j)
-						if (Game.getPlayerTwo().isComputer) setTimeout(() => Game.attackFromComputer(), 500)
+						let result
+						console.log(this, Game.getPlayerOne().gameboard.component)
+						if (this === Game.getPlayerOne().gameboard.component) {
+							result = Game.makeAttack(2, i, j) //TODO Improve this
+						} else {
+							result = Game.makeAttack(1, i, j)
+						}
+						if (result !== null) {
+							if (Game.getPlayerTwo().isComputer) {
+								setTimeout(() => Game.attackFromComputer(), 500)
+							} else {
+								setTimeout(() => ComponentBoard.switchBoards(), 1000)
+							}
+						}
 					} else if (Game.getStage() === GameStage.SELECTION) {
+						if (!ComponentShipSelectionMenu.currentShip) return
 						let newShip
 						switch (ComponentShipSelectionMenu.currentShip.name) {
 							case 'Carrier':

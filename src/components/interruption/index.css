@@ -8,6 +8,10 @@
 	align-items: center;
 	backdrop-filter: blur(0.25rem);
 	z-index: 300;
+
+	&:has(.pass-device-interruption) {
+		background: black;
+	}
 }
 
 .interruption {
@@ -57,4 +61,13 @@
 		display: flex;
 		flex-direction: column;
 	}
+
+	.names-form {
+		display: flex;
+		gap: 2rem;
+	}
+}
+
+[data-against-computer="true"] .input-section:has(#player-two-name) {
+	display: none;
 }

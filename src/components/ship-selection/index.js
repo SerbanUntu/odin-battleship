@@ -45,9 +45,11 @@ window.addEventListener('keydown', e => {
 export default class ComponentShipSelectionMenu {
 	static currentShip
 	static currentDirection = Direction.WEST
+	static #domNode
 
 	static getComponent() {
 		const component = document.createElement('div')
+		this.#domNode = component
 		component.classList.add('selection-menu')
 		const ships = [
 			new Carrier(),
@@ -78,6 +80,16 @@ export default class ComponentShipSelectionMenu {
 
 	static disableButton(shipName) {
 		const button = document.querySelector(`.${textToKebabCase(shipName)}-button`)
-		button.style.display = 'none'
+		button.classList.add('hidden')
+	}
+
+	static close() {
+		ComponentShipSelectionMenu.#domNode.classList.add('hidden')
+	}
+
+	static open() {
+		ComponentShipSelectionMenu.#domNode.classList.remove('hidden')
+		const buttons = document.querySelectorAll('.ship-button')
+		buttons.forEach(button => button.classList.remove('selected', 'hidden'))
 	}
 }

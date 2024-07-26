@@ -6,6 +6,7 @@ import { runInBrowser, runInNode } from './helper'
 import ComponentMessage from '../components/message'
 
 let dispatchedFirstPlacingFinish = false
+let dispatchedSecondPlacingFinish = false
 let dispatchedGameEnd = false
 
 export default class Game {
@@ -47,10 +48,14 @@ export default class Game {
 		return Game.init()
 	}
 
-	static setPlayers(playerOneName, againstComputer = true, playerTwoName = 'COMPUTER') {
+	static setPlayers(playerOneName, playerTwoName) {
 		if (Game.#stage !== GameStage.CONFIG) return false
 		Game.#playerOne = new Player(playerOneName, false, 1)
-		Game.#playerTwo = againstComputer ? new ComputerPlayer() : new Player(playerTwoName, false, 2)
+		if (playerTwoName === undefined) {
+			Game.#playerTwo = new ComputerPlayer()
+		} else {
+			Game.#playerTwo = new Player(playerTwoName, false, 2)
+		}
 		Game.#stage = GameStage.SELECTION
 		Game.#currentlyPlacingPlayer = Game.getPlayerOne()
 		return true
@@ -104,7 +109,15 @@ export default class Game {
 				}
 			})
 		}
-		if (Game.areAllShipsPlaced()) Game.#stage = GameStage.BATTLE
+		if (Game.areAllShipsPlaced()) {
+			Game.#stage = GameStage.BATTLE
+			runInBrowser(() => {
+				if (!dispatchedSecondPlacingFinish) {
+					dispatchedSecondPlacingFinish = true
+					window.dispatchEvent(new Event('second-placing-finish'))
+				}
+			})
+		}
 		return result
 	}
 
@@ -174,15 +187,15 @@ export default class Game {
 		)
 	}
 
-	static makeAttack(playerNumber, row, col) {
-		if (Game.#stage !== GameStage.BATTLE || Game.turnOf !== playerNumber) return null
-		const otherPlayerNumber = 2 - playerNumber + 1 // From 2 to 1 and from 1 to 2
-		const receivingPlayer = playerNumber === 1 ? Game.getPlayerTwo() : Game.getPlayerOne()
-		const dealingPlayer = playerNumber === 1 ? Game.getPlayerOne() : Game.getPlayerTwo()
+	static makeAttack(dealingPlayerNumber, row, col) {
+		if (Game.#stage !== GameStage.BATTLE || Game.turnOf !== dealingPlayerNumber) return null
+		const receivingPlayerNumber = 2 - dealingPlayerNumber + 1 // From 2 to 1 and from 1 to 2
+		const receivingPlayer = dealingPlayerNumber === 1 ? Game.getPlayerTwo() : Game.getPlayerOne()
+		const dealingPlayer = dealingPlayerNumber === 1 ? Game.getPlayerOne() : Game.getPlayerTwo()
 		let result
 		result = receivingPlayer.gameboard.receiveAttack(row, col)
 		if (result === null) return null
-		Game.turnOf = otherPlayerNumber
+		Game.turnOf = receivingPlayerNumber
 		if (receivingPlayer.gameboard.areAllSunk()) {
 			Game.#stage = GameStage.FINISHED
 			Game.winner = dealingPlayer
@@ -190,7 +203,7 @@ export default class Game {
 		runInBrowser(() => {
 			let messageComponent
 			let otherMessageComponent
-			if (otherPlayerNumber === 1) {
+			if (receivingPlayerNumber === 1) {
 				messageComponent = ComponentMessage.leftMessage
 				otherMessageComponent = ComponentMessage.rightMessage
 			} else {
