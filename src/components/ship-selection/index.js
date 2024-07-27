@@ -4,52 +4,55 @@ import ComponentShip from '../ship'
 import { textToKebabCase } from '../../lib/helper'
 import { Direction, GameStage } from '../../lib/enums'
 import Game from '../../lib/game'
-import { ComponentBoard } from '../board'
+import ComponentBoard from '../board'
 
 window.addEventListener('keydown', e => {
 	if (Game.getStage() === GameStage.SELECTION) {
 		if (e.key === 'r') {
-			switch (ComponentShipSelectionMenu.currentDirection) {
+			switch (ShipMenu.currentDirection) {
 				case Direction.SOUTH:
-					ComponentShipSelectionMenu.currentDirection = Direction.WEST
+					ShipMenu.currentDirection = Direction.WEST
 					break
 				case Direction.WEST:
-					ComponentShipSelectionMenu.currentDirection = Direction.NORTH
+					ShipMenu.currentDirection = Direction.NORTH
 					break
 				case Direction.NORTH:
-					ComponentShipSelectionMenu.currentDirection = Direction.EAST
+					ShipMenu.currentDirection = Direction.EAST
 					break
 				case Direction.EAST:
-					ComponentShipSelectionMenu.currentDirection = Direction.SOUTH
+					ShipMenu.currentDirection = Direction.SOUTH
 			}
 			ComponentBoard.updateGhost()
 		} else if (e.shiftKey && e.key === 'R') {
-			switch (ComponentShipSelectionMenu.currentDirection) {
+			switch (ShipMenu.currentDirection) {
 				case Direction.SOUTH:
-					ComponentShipSelectionMenu.currentDirection = Direction.EAST
+					ShipMenu.currentDirection = Direction.EAST
 					break
 				case Direction.EAST:
-					ComponentShipSelectionMenu.currentDirection = Direction.NORTH
+					ShipMenu.currentDirection = Direction.NORTH
 					break
 				case Direction.NORTH:
-					ComponentShipSelectionMenu.currentDirection = Direction.WEST
+					ShipMenu.currentDirection = Direction.WEST
 					break
 				case Direction.WEST:
-					ComponentShipSelectionMenu.currentDirection = Direction.SOUTH
+					ShipMenu.currentDirection = Direction.SOUTH
 			}
 			ComponentBoard.updateGhost()
 		}
 	}
 })
 
-export default class ComponentShipSelectionMenu {
+export default class ShipMenu {
 	static currentShip
 	static currentDirection = Direction.WEST
-	static #domNode
+	static #domNode = ShipMenu.#getNewComponent()
 
-	static getComponent() {
+	static init() {
+		ShipMenu.moveToLeft()
+	}
+
+	static #getNewComponent() {
 		const component = document.createElement('div')
-		this.#domNode = component
 		component.classList.add('selection-menu')
 		const ships = [
 			new Carrier(),
@@ -62,7 +65,7 @@ export default class ComponentShipSelectionMenu {
 			const button = document.createElement('button')
 			button.classList.add('ship-button')
 			button.classList.add(`${textToKebabCase(ship.name)}-button`)
-			button.appendChild(new ComponentShip(ship).getComponent())
+			button.appendChild(new ComponentShip(ship).getNewComponent())
 			const shipName = document.createElement('p')
 			shipName.textContent = ship.name
 			button.appendChild(shipName)
@@ -71,11 +74,15 @@ export default class ComponentShipSelectionMenu {
 				const buttons = component.querySelectorAll('button')
 				buttons.forEach(btn => btn.classList.remove('selected'))
 				button.classList.add('selected')
-				ComponentShipSelectionMenu.currentShip = ship
+				ShipMenu.currentShip = ship
 			})
 			component.appendChild(button)
 		})
 		return component
+	}
+
+	static getComponentReference() {
+		return ShipMenu.#domNode
 	}
 
 	static disableButton(shipName) {
@@ -84,12 +91,22 @@ export default class ComponentShipSelectionMenu {
 	}
 
 	static close() {
-		ComponentShipSelectionMenu.#domNode.classList.add('hidden')
+		ShipMenu.#domNode.classList.add('hidden')
 	}
 
-	static open() {
-		ComponentShipSelectionMenu.#domNode.classList.remove('hidden')
+	static reload() {
+		ShipMenu.#domNode.classList.remove('hidden')
 		const buttons = document.querySelectorAll('.ship-button')
 		buttons.forEach(button => button.classList.remove('selected', 'hidden'))
+	}
+
+	static moveToLeft() {
+		ShipMenu.#domNode.remove()
+		ComponentBoard.leftBoard.getSectionReference().appendChild(ShipMenu.#domNode)
+	}
+
+	static moveToRight() {
+		ShipMenu.#domNode.remove()
+		ComponentBoard.rightBoard.getSectionReference().appendChild(ShipMenu.#domNode)
 	}
 }

@@ -55,7 +55,6 @@ input {
 .board-owner {
 	font-size: 3rem;
 	font-weight: 400;
-	display: inline;
 }
 
 .ghost {

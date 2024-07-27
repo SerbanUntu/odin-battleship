@@ -1,71 +1,72 @@
 import './index.css'
+import textures from '../../lib/texture'
 import Gameboard from '../../lib/gameboard'
-import { BoardDisplay, Direction, GameStage } from '../../lib/enums'
+import { BoardDisplay, GameStage } from '../../lib/enums'
 import ComponentShip from '../ship'
 
-import MissMark from '../../images/miss_mark.svg'
-import HitMark from '../../images/hit_mark.svg'
 import Game from '../../lib/game'
-import ComponentShipSelectionMenu from '../ship-selection'
-import { Carrier, Battleship, Destroyer, Submarine, PatrolBoat } from '../../lib/ship'
-import {
-	hideInterruption,
-	PassDeviceInterruptionContainer,
-	showInterruption,
-} from '../interruption'
+import ShipMenu from '../ship-selection'
+import Interruption from '../interruption'
+import { directionToClassName, getNewShipObject } from '../../lib/helper'
 
-export class ComponentBoard {
-	#display = false
-	#domNode = null
+export default class ComponentBoard {
+	static leftBoard = null
+	static rightBoard = null
+
+	#domNode = this.#getNewComponent()
+	#sectionNode
+	#ownerTextNode
+	#display
+
+	constructor(sectionNode, display = BoardDisplay.NONE) {
+		this.#sectionNode = sectionNode
+		this.#sectionNode.appendChild(this.#domNode)
+		this.#ownerTextNode = this.#sectionNode.querySelector('.board-owner')
+		this.setDisplay(display)
+	}
+
+	static init() {
+		ComponentBoard.leftBoard = new ComponentBoard(document.querySelector('#left-section'))
+		ComponentBoard.rightBoard = new ComponentBoard(document.querySelector('#right-section'))
+	}
 
 	static updateGhost() {
 		const ghosts = document.querySelectorAll('.ghost')
 		ghosts.forEach(ghost => {
 			ghost.classList.remove('facing-west', 'facing-east', 'facing-north', 'facing-south')
-			switch (ComponentShipSelectionMenu.currentDirection) {
-				case Direction.EAST:
-					ghost.classList.add('facing-east')
-					break
-				case Direction.WEST:
-					ghost.classList.add('facing-west')
-					break
-				case Direction.SOUTH:
-					ghost.classList.add('facing-south')
-					break
-				case Direction.NORTH:
-					ghost.classList.add('facing-north')
-					break
-			}
+			ghost.classList.add(directionToClassName(ShipMenu.currentDirection))
 		})
 	}
 
 	static switchBoards() {
-		const leftBoard = Game.getPlayerOne().gameboard.component
-		const rightBoard = Game.getPlayerTwo().gameboard.component
-		const interruption = document.querySelector('.pass-device-interruption-container')
-		PassDeviceInterruptionContainer.updateName(
+		Interruption.pass.updateName(
 			Game.turnOf === 1 ? Game.getPlayerOne().name : Game.getPlayerTwo().name,
 		)
-		showInterruption(interruption)
-		interruption.querySelector('.continue').onclick = e => {
+		Interruption.pass.show()
+		Interruption.pass.continueButton.onclick = e => {
 			e.preventDefault()
-			hideInterruption(interruption)
-			if (leftBoard.#domNode.classList.contains('active')) {
-				leftBoard.setDisplay(BoardDisplay.NO_SHIPS)
-				rightBoard.setDisplay(BoardDisplay.ACTIVE)
-			} else {
-				rightBoard.setDisplay(BoardDisplay.NO_SHIPS)
-				leftBoard.setDisplay(BoardDisplay.ACTIVE)
-			}
+			const temp = ComponentBoard.leftBoard.#display
+			ComponentBoard.leftBoard.setDisplay(ComponentBoard.rightBoard.#display)
+			ComponentBoard.rightBoard.setDisplay(temp)
+			Interruption.pass.hide()
 		}
+	}
+
+	getComponentReference() {
+		return this.#domNode
+	}
+
+	getSectionReference() {
+		return this.#sectionNode
 	}
 
 	setDisplay(display) {
 		this.#display = display
-		this.#domNode.classList.remove('no-ships', 'placing', 'active', 'hidden')
-		switch (display) {
+		this.#domNode.classList.remove('no-ships', 'placing', 'active')
+		this.#sectionNode.classList.remove('hidden')
+		switch (this.#display) {
 			case BoardDisplay.NONE:
-				this.#domNode.classList.add('hidden')
+				this.#sectionNode.classList.add('hidden')
 				break
 			case BoardDisplay.NO_SHIPS:
 				this.#domNode.classList.add('no-ships')
@@ -82,9 +83,8 @@ export class ComponentBoard {
 		return this.hidden
 	}
 
-	getComponent() {
+	#getNewComponent() {
 		const component = document.createElement('div')
-		this.#domNode = component
 		component.classList.add('board')
 		let cellSize = getComputedStyle(document.body).getPropertyValue('--cell-size')
 		cellSize = Number(
@@ -105,21 +105,14 @@ export class ComponentBoard {
 				cell.addEventListener('mouseenter', e => {
 					e.preventDefault()
 					if (Game.getStage() !== GameStage.SELECTION) return
-					if (!ComponentShipSelectionMenu.currentShip) return
-					this.renderShip(
-						ComponentShipSelectionMenu.currentShip,
-						i,
-						j,
-						ComponentShipSelectionMenu.currentDirection,
-						true,
-					)
+					if (!ShipMenu.currentShip) return
+					this.renderShip(ShipMenu.currentShip, i, j, ShipMenu.currentDirection, true)
 				})
 
 				cell.addEventListener('click', e => {
 					e.preventDefault()
 					if (Game.getStage() === GameStage.BATTLE) {
 						let result
-						console.log(this, Game.getPlayerOne().gameboard.component)
 						if (this === Game.getPlayerOne().gameboard.component) {
 							result = Game.makeAttack(2, i, j) //TODO Improve this
 						} else {
@@ -133,35 +126,17 @@ export class ComponentBoard {
 							}
 						}
 					} else if (Game.getStage() === GameStage.SELECTION) {
-						if (!ComponentShipSelectionMenu.currentShip) return
-						let newShip
-						switch (ComponentShipSelectionMenu.currentShip.name) {
-							case 'Carrier':
-								newShip = new Carrier()
-								break
-							case 'Battleship':
-								newShip = new Battleship()
-								break
-							case 'Destroyer':
-								newShip = new Destroyer()
-								break
-							case 'Submarine':
-								newShip = new Submarine()
-								break
-							case 'Patrol boat':
-								newShip = new PatrolBoat()
-								break
-						}
+						if (!ShipMenu.currentShip) return
 						const result = Game.placeShip(
 							Game.getCurrentlyPlacingPlayer().number,
-							newShip,
+							getNewShipObject(ShipMenu.currentShip.name),
 							i,
 							j,
-							ComponentShipSelectionMenu.currentDirection,
+							ShipMenu.currentDirection,
 						)
 						if (result) {
-							ComponentShipSelectionMenu.disableButton(ComponentShipSelectionMenu.currentShip.name)
-							ComponentShipSelectionMenu.currentShip = null
+							ShipMenu.disableButton(ShipMenu.currentShip.name)
+							ShipMenu.currentShip = null
 						}
 					}
 				})
@@ -175,7 +150,7 @@ export class ComponentBoard {
 
 	renderShip(ship, row, col, direction, ghost = false) {
 		const cell = this.#domNode.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`)
-		const shipImage = new ComponentShip(ship, direction).getComponent()
+		const shipImage = new ComponentShip(ship, direction).getNewComponent()
 		if (ghost) {
 			const ghosts = document.querySelectorAll('.ghost')
 			ghosts.forEach(ghost => ghost.remove())
@@ -186,15 +161,14 @@ export class ComponentBoard {
 
 	receiveAttack(row, col, miss) {
 		const cell = this.#domNode.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`)
-		let mark
-		if (miss) {
-			mark = new Image(12, 12)
-			mark.src = MissMark
-		} else {
-			mark = new Image(16, 16)
-			mark.src = HitMark
-		}
+		const textureCode = miss ? 'Miss' : 'Hit'
+		const mark = new Image(textures[textureCode].width, textures[textureCode].height)
+		mark.src = textures[textureCode].src
 		mark.classList.add('mark')
 		cell.appendChild(mark)
+	}
+
+	updateOwnerText(text) {
+		this.#ownerTextNode.textContent = text
 	}
 }

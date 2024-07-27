@@ -1,4 +1,4 @@
-import { ComponentBoard } from '../components/board'
+import ComponentBoard from '../components/board'
 import { Direction } from './enums'
 import { runInBrowser } from './helper'
 
@@ -10,11 +10,12 @@ class GameboardSquare {
 export default class Gameboard {
 	static size = 10
 
-	component = new ComponentBoard()
+	component = null
 	ships = []
 	squares = []
 
-	constructor() {
+	constructor(component) {
+		this.component = component
 		for (let i = 0; i < Gameboard.size; i++) {
 			const currentRow = []
 			for (let j = 0; j < Gameboard.size; j++) {

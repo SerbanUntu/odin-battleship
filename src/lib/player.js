@@ -1,3 +1,4 @@
+import ComponentBoard from '../components/board'
 import Gameboard from './gameboard'
 
 export default class Player {
@@ -6,16 +7,16 @@ export default class Player {
 	number
 	gameboard
 
-	constructor(name, isComputer, number) {
+	constructor(name, isComputer, number, gameboardComponent) {
 		this.name = name
 		this.isComputer = isComputer
 		this.number = number
-		this.gameboard = new Gameboard()
+		this.gameboard = new Gameboard(gameboardComponent)
 	}
 }
 
 export class ComputerPlayer extends Player {
 	constructor() {
-		super('COMPUTER', true, 2)
+		super('COMPUTER', true, 2, ComponentBoard.rightBoard)
 	}
 }

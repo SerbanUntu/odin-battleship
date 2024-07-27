@@ -24,5 +24,5 @@ export class BoardDisplay {
 	static NONE = Symbol('BoardDisplay.NONE')
 	static PLACING = Symbol('BoardDisplay.PLACING')
 	static NO_SHIPS = Symbol('BoardDisplay.NO_SHIPS')
-	static ALL = Symbol('BoardDisplay.ACTIVE')
+	static ACTIVE = Symbol('BoardDisplay.ACTIVE')
 }

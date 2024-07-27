@@ -29,6 +29,7 @@
 		max-width: 9999px;
 		z-index: 100;
 		pointer-events: none;
+		user-select: none;
 	}
 
 	.ship-image.facing-north {

@@ -4,6 +4,7 @@ import { Carrier, Battleship, Destroyer, Submarine, PatrolBoat } from './ship'
 import { Direction } from './enums'
 import { runInBrowser, runInNode } from './helper'
 import ComponentMessage from '../components/message'
+import ComponentBoard from '../components/board'
 
 let dispatchedFirstPlacingFinish = false
 let dispatchedSecondPlacingFinish = false
@@ -14,6 +15,7 @@ export default class Game {
 	static #playerOne = null
 	static #playerTwo = null
 	static #currentlyPlacingPlayer = null
+	static againstComputer = null
 	static winner = null
 	static turnOf = 1
 
@@ -48,13 +50,20 @@ export default class Game {
 		return Game.init()
 	}
 
+	static setAgainstComputer(againstComputer) {
+		Game.againstComputer = againstComputer
+		runInBrowser(() => {
+			document.body.dataset.againstComputer = `${Game.againstComputer}`
+		})
+	}
+
 	static setPlayers(playerOneName, playerTwoName) {
 		if (Game.#stage !== GameStage.CONFIG) return false
-		Game.#playerOne = new Player(playerOneName, false, 1)
-		if (playerTwoName === undefined) {
-			Game.#playerTwo = new ComputerPlayer()
+		Game.#playerOne = new Player(playerOneName, false, 1, ComponentBoard.leftBoard)
+		if (playerTwoName) {
+			Game.#playerTwo = new Player(playerTwoName, false, 2, ComponentBoard.rightBoard)
 		} else {
-			Game.#playerTwo = new Player(playerTwoName, false, 2)
+			Game.#playerTwo = new ComputerPlayer()
 		}
 		Game.#stage = GameStage.SELECTION
 		Game.#currentlyPlacingPlayer = Game.getPlayerOne()

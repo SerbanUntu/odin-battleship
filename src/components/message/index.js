@@ -1,5 +1,6 @@
 import './index.css'
 import { MessageType } from '../../lib/enums'
+import ComponentBoard from '../board'
 
 export default class ComponentMessage {
 	static leftMessage = null
@@ -16,17 +17,17 @@ export default class ComponentMessage {
 	}
 
 	static init() {
-		const leftSection = document.querySelector('#left-section')
-		const rightSection = document.querySelector('#right-section')
+		const leftSection = ComponentBoard.leftBoard.getSectionReference()
+		const rightSection = ComponentBoard.rightBoard.getSectionReference()
 
 		ComponentMessage.leftMessage = new ComponentMessage()
 		ComponentMessage.rightMessage = new ComponentMessage()
 
-		leftSection.appendChild(ComponentMessage.leftMessage.#getComponent())
-		rightSection.appendChild(ComponentMessage.rightMessage.#getComponent())
+		leftSection.appendChild(ComponentMessage.leftMessage.#getNewComponent())
+		rightSection.appendChild(ComponentMessage.rightMessage.#getNewComponent())
 	}
 
-	#getComponent() {
+	#getNewComponent() {
 		const component = document.createElement('p')
 		this.#domNode = component
 		component.classList.add('message')
