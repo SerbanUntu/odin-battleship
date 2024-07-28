@@ -119,6 +119,7 @@ export default class ComponentBoard {
 							result = Game.makeAttack(1, i, j)
 						}
 						if (result !== null) {
+							// && !Game.winner
 							if (Game.getPlayerTwo().isComputer) {
 								setTimeout(() => Game.attackFromComputer(), 500)
 							} else {
@@ -170,5 +171,13 @@ export default class ComponentBoard {
 
 	updateOwnerText(text) {
 		this.#ownerTextNode.textContent = text
+		this.#ownerTextNode.setAttribute('title', text)
+	}
+
+	reset() {
+		const cells = this.#domNode.querySelectorAll('.cell')
+		cells.forEach(cell => {
+			cell.replaceChildren()
+		})
 	}
 }

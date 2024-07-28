@@ -57,6 +57,8 @@ export default class ComponentMessage {
 	}
 
 	setContent(msg) {
+		if (msg === '') this.hide()
+		else this.show()
 		this.#content = msg
 		this.streamContent()
 	}
@@ -110,5 +112,13 @@ export default class ComponentMessage {
 	updateEmpty() {
 		this.setType(MessageType.EMPTY)
 		this.setContent('')
+	}
+
+	show() {
+		this.#domNode.classList.remove('hidden')
+	}
+
+	hide() {
+		this.#domNode.classList.add('hidden')
 	}
 }

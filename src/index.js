@@ -44,6 +44,8 @@ function namesSetup() {
 }
 
 function placeShipsFirst() {
+	ShipMenu.moveToLeft()
+	ShipMenu.reload()
 	ComponentBoard.leftBoard.updateOwnerText(Game.getPlayerOne().name)
 	ComponentBoard.rightBoard.updateOwnerText(Game.getPlayerTwo().name)
 	ComponentBoard.leftBoard.setDisplay(BoardDisplay.PLACING)
@@ -97,10 +99,23 @@ function endGame() {
 	Interruption.closing.updateName(Game.winner.name)
 	Interruption.closing.rematchButton.addEventListener('click', e => {
 		e.preventDefault()
-		location.reload() //TODO
+		Interruption.closing.hide()
+		Game.rematch()
+		ComponentBoard.leftBoard.setDisplay(BoardDisplay.PLACING)
+		ComponentBoard.rightBoard.setDisplay(BoardDisplay.NONE)
+		ComponentMessage.leftMessage.updateEmpty()
+		ComponentMessage.rightMessage.updateEmpty()
+		ShipMenu.moveToLeft()
+		ShipMenu.reload()
 	})
 	Interruption.closing.newPlayersButton.addEventListener('click', e => {
 		e.preventDefault()
-		location.reload() //TODO
+		Interruption.closing.hide()
+		Game.restart()
+		ComponentBoard.leftBoard.setDisplay(BoardDisplay.NONE)
+		ComponentBoard.rightBoard.setDisplay(BoardDisplay.NONE)
+		ComponentMessage.leftMessage.updateEmpty()
+		ComponentMessage.rightMessage.updateEmpty()
+		showOpening()
 	})
 }

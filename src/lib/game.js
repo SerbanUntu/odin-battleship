@@ -31,23 +31,11 @@ export default class Game {
 		return options[randomIndex]
 	}
 
-	static init() {
-		if (Game.#stage !== GameStage.FINISHED) return false
-		Game.#stage = GameStage.CONFIG
-		Game.#playerOne = null
-		Game.#playerTwo = null
-		Game.#currentlyPlacingPlayer = null
-		Game.againstComputer = null
-		Game.winner = null
-		Game.turnOf = 1
-		return true
-	}
-
 	static initWithOverride() {
 		runInNode(() => {
 			Game.#stage = GameStage.FINISHED
 		})
-		return Game.init()
+		return Game.restart()
 	}
 
 	static setAgainstComputer(againstComputer) {
@@ -254,5 +242,36 @@ export default class Game {
 			result = Game.makeAttack(2, ...Game.getRandomCoordinates())
 		}
 		return result
+	}
+
+	static rematch() {
+		if (Game.#stage !== GameStage.FINISHED) return false
+		Game.getPlayerOne().gameboard.reset()
+		Game.getPlayerTwo().gameboard.reset()
+		Game.#stage = GameStage.SELECTION
+		Game.#currentlyPlacingPlayer = Game.getPlayerOne()
+		Game.turnOf = 1
+		Game.winner = null
+		dispatchedFirstPlacingFinish = false
+		dispatchedSecondPlacingFinish = false
+		dispatchedGameEnd = false
+		return true
+	}
+
+	static restart() {
+		if (Game.#stage !== GameStage.FINISHED) return false
+		Game.getPlayerOne().gameboard.reset()
+		Game.getPlayerTwo().gameboard.reset()
+		Game.#stage = GameStage.CONFIG
+		Game.#playerOne = null
+		Game.#playerTwo = null
+		Game.#currentlyPlacingPlayer = null
+		Game.againstComputer = null
+		Game.winner = null
+		Game.turnOf = 1
+		dispatchedFirstPlacingFinish = false
+		dispatchedSecondPlacingFinish = false
+		dispatchedGameEnd = false
+		return true
 	}
 }

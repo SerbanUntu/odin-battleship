@@ -87,6 +87,7 @@ class NamingInterruption extends Interruption {
 		const label = this.dialogNode.querySelector('label[for="player-one-name"]')
 		label.textContent = Game.againstComputer ? 'Your name' : "Player 1's name"
 		if (Game.againstComputer) this.secondInput.setAttribute('disabled', '')
+		else this.secondInput.removeAttribute('disabled')
 	}
 
 	getNewContainer() {
@@ -97,11 +98,11 @@ class NamingInterruption extends Interruption {
 				<form id="names-form" class="names-form">
 					<section class="input-section">
 						<label for="player-one-name"></label>
-						<input id="player-one-name" class="player-one-name" name="player-one-name" type="text" required maxlength="30" />
+						<input id="player-one-name" class="player-one-name" name="player-one-name" type="text" required maxlength="20" />
 					</section>
 					<section class="input-section">
 						<label for="player-two-name">Player 2&apos;s name</label>
-						<input id="player-two-name" class="player-two-name" name="player-two-name" type="text" required maxlength="30" />
+						<input id="player-two-name" class="player-two-name" name="player-two-name" type="text" required maxlength="20" />
 					</section>
 				</form>
 				<button type="submit" class="decision start-game" form="names-form">Start</button>

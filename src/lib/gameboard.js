@@ -95,4 +95,17 @@ export default class Gameboard {
 	areAllSunk() {
 		return this.ships.filter(s => !s.isSunk()).length === 0
 	}
+
+	reset() {
+		this.ships = []
+		runInBrowser(() => {
+			this.component.reset()
+		})
+		for (let i = 0; i < Gameboard.size; i++) {
+			for (let j = 0; j < Gameboard.size; j++) {
+				this.squares[i][j].ship = null
+				this.squares[i][j].hit = false
+			}
+		}
+	}
 }

@@ -54,6 +54,7 @@
 
 		&:focus {
 			outline: 4px solid white;
+			outline-offset: -4px;
 		}
 	}
 

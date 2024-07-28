@@ -1,6 +1,6 @@
 .board {
-	padding: 0.75rem;
-	border: 0.5rem solid var(--cell-bg);
+	padding: var(--board-padding);
+	border: var(--board-border) solid var(--cell-bg);
 	background: var(--board-bg);
 	display: grid;
 	grid-template-columns: repeat(10, var(--cell-size));

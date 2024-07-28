@@ -7,38 +7,16 @@ import Game from '../../lib/game'
 import ComponentBoard from '../board'
 
 window.addEventListener('keydown', e => {
-	if (Game.getStage() === GameStage.SELECTION) {
-		if (e.key === 'r') {
-			switch (ShipMenu.currentDirection) {
-				case Direction.SOUTH:
-					ShipMenu.currentDirection = Direction.WEST
-					break
-				case Direction.WEST:
-					ShipMenu.currentDirection = Direction.NORTH
-					break
-				case Direction.NORTH:
-					ShipMenu.currentDirection = Direction.EAST
-					break
-				case Direction.EAST:
-					ShipMenu.currentDirection = Direction.SOUTH
-			}
-			ComponentBoard.updateGhost()
-		} else if (e.shiftKey && e.key === 'R') {
-			switch (ShipMenu.currentDirection) {
-				case Direction.SOUTH:
-					ShipMenu.currentDirection = Direction.EAST
-					break
-				case Direction.EAST:
-					ShipMenu.currentDirection = Direction.NORTH
-					break
-				case Direction.NORTH:
-					ShipMenu.currentDirection = Direction.WEST
-					break
-				case Direction.WEST:
-					ShipMenu.currentDirection = Direction.SOUTH
-			}
-			ComponentBoard.updateGhost()
-		}
+	if (Game.getStage() !== GameStage.SELECTION) return
+	switch (e.key) {
+		case 'r':
+			ShipMenu.rotateCurrentClockwise()
+			break
+		case 'R':
+			if (e.shiftKey) ShipMenu.rotateCurrentCounterClockwise()
+			break
+		case 'q':
+			ShipMenu.removeSelection()
 	}
 })
 
@@ -108,5 +86,47 @@ export default class ShipMenu {
 	static moveToRight() {
 		ShipMenu.#domNode.remove()
 		ComponentBoard.rightBoard.getSectionReference().appendChild(ShipMenu.#domNode)
+	}
+
+	static rotateCurrentClockwise() {
+		switch (ShipMenu.currentDirection) {
+			case Direction.SOUTH:
+				ShipMenu.currentDirection = Direction.WEST
+				break
+			case Direction.WEST:
+				ShipMenu.currentDirection = Direction.NORTH
+				break
+			case Direction.NORTH:
+				ShipMenu.currentDirection = Direction.EAST
+				break
+			case Direction.EAST:
+				ShipMenu.currentDirection = Direction.SOUTH
+		}
+		ComponentBoard.updateGhost()
+	}
+
+	static rotateCurrentCounterClockwise() {
+		switch (ShipMenu.currentDirection) {
+			case Direction.SOUTH:
+				ShipMenu.currentDirection = Direction.EAST
+				break
+			case Direction.EAST:
+				ShipMenu.currentDirection = Direction.NORTH
+				break
+			case Direction.NORTH:
+				ShipMenu.currentDirection = Direction.WEST
+				break
+			case Direction.WEST:
+				ShipMenu.currentDirection = Direction.SOUTH
+		}
+		ComponentBoard.updateGhost()
+	}
+
+	static removeSelection() {
+		ShipMenu.currentShip = null
+		const ghosts = document.querySelectorAll('.ghost')
+		ghosts.forEach(ghost => ghost.remove())
+		const buttons = ShipMenu.#domNode.querySelectorAll('button')
+		buttons.forEach(btn => btn.classList.remove('selected'))
 	}
 }

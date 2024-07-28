@@ -1,6 +1,8 @@
 :root {
 	--cell-size: 32px;
 	--grid-gap: 4px;
+	--board-padding: 0.75rem;
+	--board-border: 0.5rem;
 
 	--app-bg: hsl(0deg 0% 10%);
 	--board-bg: hsl(0deg 0% 15%);
@@ -55,6 +57,11 @@ input {
 .board-owner {
 	font-size: 3rem;
 	font-weight: 400;
+	max-width: calc(var(--cell-size) * 10 + var(--grid-gap) * 9 + var(--board-padding) * 2 + var(--board-border) * 2);
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	text-align: center;
 }
 
 .ghost {
