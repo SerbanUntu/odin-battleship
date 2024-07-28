@@ -196,20 +196,16 @@ export default class Game {
 		}
 		runInBrowser(() => {
 			let messageComponent
-			let otherMessageComponent
 			if (receivingPlayerNumber === 1) {
 				messageComponent = ComponentMessage.leftMessage
-				otherMessageComponent = ComponentMessage.rightMessage
 			} else {
 				messageComponent = ComponentMessage.rightMessage
-				otherMessageComponent = ComponentMessage.leftMessage
 			}
 			if (result === false) {
 				messageComponent.updateMiss()
 			} else {
 				if (receivingPlayer.gameboard.areAllSunk()) {
 					messageComponent.updateWin(dealingPlayer.isComputer)
-					otherMessageComponent.updateLoss(receivingPlayer.isComputer)
 					if (!dispatchedGameEnd) {
 						dispatchedGameEnd = true
 						window.dispatchEvent(new Event('game-end'))
@@ -217,11 +213,7 @@ export default class Game {
 				} else {
 					const receivingShip = receivingPlayer.gameboard.squares[row][col].ship
 					if (receivingShip.isSunk()) {
-						messageComponent.updateSink(
-							receivingPlayer.isComputer,
-							dealingPlayer.name,
-							receivingShip.name,
-						)
+						messageComponent.updateSink(receivingShip.name)
 					} else {
 						messageComponent.updateHit()
 					}
@@ -234,9 +226,70 @@ export default class Game {
 	static attackFromComputer() {
 		if (Game.#stage !== GameStage.BATTLE || !Game.getPlayerTwo().isComputer || Game.turnOf !== 2)
 			return null
-		let result = Game.makeAttack(2, ...getRandomCoordinates())
-		while (result === null) {
-			result = Game.makeAttack(2, ...getRandomCoordinates())
+		const computer = Game.getPlayerTwo()
+		let coords
+		let result = null
+		if (computer.lastHits.length === 0) {
+			while (result === null) {
+				coords = getRandomCoordinates()
+				result = Game.makeAttack(2, ...coords)
+			}
+		} else if (computer.lastHits.length === 1) {
+			const neighbours = [
+				[0, 1],
+				[0, -1],
+				[-1, 0],
+				[1, 0],
+			]
+			let index = 0
+			while (result === null && index < 4) {
+				coords = [
+					computer.lastHits[0][0] + neighbours[index][0],
+					computer.lastHits[0][1] + neighbours[index][1],
+				]
+				result = Game.makeAttack(2, ...coords)
+				index++
+			}
+			if (index === 4) {
+				while (result === null) {
+					coords = getRandomCoordinates()
+					result = Game.makeAttack(2, ...coords)
+				}
+			}
+		} else if (computer.lastHits.length > 1) {
+			let diff = [
+				computer.lastHits[1][0] - computer.lastHits[0][0],
+				computer.lastHits[1][1] - computer.lastHits[0][1],
+			]
+			coords = [
+				computer.lastHits[computer.lastHits.length - 1][0] + diff[0],
+				computer.lastHits[computer.lastHits.length - 1][1] + diff[1],
+			]
+			result = Game.makeAttack(2, ...coords)
+			if (result === null) {
+				computer.lastHits = [computer.lastHits[1], computer.lastHits[0]]
+				diff = [
+					computer.lastHits[0][0] - computer.lastHits[1][0],
+					computer.lastHits[0][1] - computer.lastHits[1][1],
+				]
+				coords = [
+					computer.lastHits[computer.lastHits.length - 1][0] + diff[0],
+					computer.lastHits[computer.lastHits.length - 1][1] + diff[1],
+				]
+				result = Game.makeAttack(2, ...coords)
+				if (!result) {
+					computer.lastHits = []
+				}
+			} else if (result === false) {
+				computer.lastHits = [computer.lastHits[1], computer.lastHits[0]]
+			}
+			while (result === null) {
+				coords = getRandomCoordinates()
+				result = Game.makeAttack(2, ...coords)
+			}
+		}
+		if (result !== false) {
+			computer.lastHits.push(coords)
 		}
 		return result
 	}

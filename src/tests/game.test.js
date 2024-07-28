@@ -31,7 +31,6 @@ test.skip('Config stage', () => {
 	expect(Game.getStage()).toBe(GameStage.CONFIG)
 	Game.setPlayers('John')
 	expect(Game.getStage()).toBe(GameStage.PLACING)
-	console.log(Game.getPlayerOne())
 	expect(Game.getPlayerOne()).toEqual(new Player('John', false, 1))
 	expect(Game.getPlayerTwo()).toEqual(new Player('COMPUTER', true, 2))
 })

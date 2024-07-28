@@ -16,6 +16,8 @@ export default class Player {
 }
 
 export class ComputerPlayer extends Player {
+	lastHits = []
+
 	constructor() {
 		super('COMPUTER', true, 2, ComponentBoard.rightBoard)
 	}

@@ -39,6 +39,7 @@ export default class ComponentBoard {
 	}
 
 	static switchBoards() {
+		if (Game.winner !== null || Game.getStage() !== GameStage.BATTLE) return false
 		Interruption.pass.updateName(
 			Game.turnOf === 1 ? Game.getPlayerOne().name : Game.getPlayerTwo().name,
 		)
@@ -50,6 +51,7 @@ export default class ComponentBoard {
 			ComponentBoard.rightBoard.setDisplay(temp)
 			Interruption.pass.hide()
 		}
+		return true
 	}
 
 	getComponentReference() {
@@ -114,18 +116,17 @@ export default class ComponentBoard {
 					if (Game.getStage() === GameStage.BATTLE) {
 						let result
 						if (this === Game.getPlayerOne().gameboard.component) {
-							result = Game.makeAttack(2, i, j) //TODO Improve this
+							result = Game.makeAttack(2, i, j)
 						} else {
 							result = Game.makeAttack(1, i, j)
 						}
 						if (result !== null) {
-							// && !Game.winner
 							if (Game.getPlayerTwo().isComputer) {
-								// 500ms after message finishes streaming
 								setTimeout(() => Game.attackFromComputer(), 500)
 							} else {
-								// 500ms after message finishes streaming
-								setTimeout(() => ComponentBoard.switchBoards(), 1000)
+								window.addEventListener('finish-streaming', () => {
+									setTimeout(() => ComponentBoard.switchBoards(), 500)
+								})
 							}
 						}
 					} else if (Game.getStage() === GameStage.PLACING) {

@@ -72,6 +72,7 @@ export default class ComponentMessage {
 		let index = 0
 		this.#activeInterval = setInterval(() => {
 			if (index === letters.length) {
+				window.dispatchEvent(new Event('finish-streaming'))
 				clearInterval(this.#activeInterval)
 				this.#activeInterval = null
 				return
@@ -91,22 +92,15 @@ export default class ComponentMessage {
 		this.setContent("It's a hit!")
 	}
 
-	updateSink(forComputer, dealingPlayerName = 'The opponent', shipName = 'ship') {
+	updateSink(shipName = 'ship') {
 		this.setType(MessageType.IMPORTANT)
-		if (forComputer) this.setContent(`You sunk the opponent's ${shipName}!`)
-		else this.setContent(`${dealingPlayerName} sunk your ${shipName}!`)
+		this.setContent(`The ${shipName} was sunk!`)
 	}
 
 	updateWin(forComputer) {
 		this.setType(MessageType.WIN)
 		if (forComputer) this.setContent('The computer won!')
 		else this.setContent('You won!')
-	}
-
-	updateLoss(forComputer) {
-		this.setType(MessageType.HIT)
-		if (forComputer) this.setContent('The computer lost!')
-		else this.setContent('You lost!')
 	}
 
 	updateEmpty() {
