@@ -6,7 +6,7 @@ export class Direction {
 }
 
 export class GameStage {
-	static CONFIG = Symbol('GameStage.CONFIG') // setPlayers
+	static CONFIG = Symbol('GameStage.CONFIG') // setAgainstComputer, setPlayers
 	static PLACING = Symbol('GameStage.PLACING') // placeShip, autoPlace, randomPlace
 	static BATTLE = Symbol('GameStage.BATTLE') // makeAttack, attackFromComputer
 	static FINISHED = Symbol('GameStage.FINISHED') // rematch, restart
