@@ -1,4 +1,5 @@
 import { Battleship, Carrier, Destroyer, PatrolBoat, Submarine } from './ship'
+import { Direction } from './enums'
 
 export function runInBrowser(cb) {
 	try {
@@ -12,7 +13,9 @@ export function runInNode(cb) {
 	try {
 		process
 		cb()
-	} catch {}
+	} catch {
+		return
+	}
 }
 
 export function textToKebabCase(text) {
@@ -38,4 +41,16 @@ export function getNewShipObject(shipName) {
 		'Patrol boat': new PatrolBoat(),
 	}
 	return newShips[shipName]
+}
+
+export function getRandomCoordinates() {
+	let row = Math.floor(Math.random() * 10)
+	let col = Math.floor(Math.random() * 10)
+	return [row, col]
+}
+
+export function getRandomDirection() {
+	let options = [Direction.EAST, Direction.NORTH, Direction.SOUTH, Direction.WEST]
+	let randomIndex = Math.floor(Math.random() * 4)
+	return options[randomIndex]
 }

@@ -4,7 +4,7 @@ import './styles/util.css'
 import Game from './lib/game'
 import ComponentMessage from './components/message'
 import Interruption from './components/interruption'
-import ShipMenu from './components/ship-selection'
+import ShipMenu from './components/ship-menu'
 import { BoardDisplay } from './lib/enums'
 import ComponentBoard from './components/board'
 

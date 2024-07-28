@@ -7,9 +7,9 @@ export class Direction {
 
 export class GameStage {
 	static CONFIG = Symbol('GameStage.CONFIG') // setPlayers
-	static SELECTION = Symbol('GameStage.SELECTION') // placeShip, autoPlace, randomPlace
+	static PLACING = Symbol('GameStage.PLACING') // placeShip, autoPlace, randomPlace
 	static BATTLE = Symbol('GameStage.BATTLE') // makeAttack, attackFromComputer
-	static FINISHED = Symbol('GameStage.FINISHED') // init
+	static FINISHED = Symbol('GameStage.FINISHED') // rematch, restart
 }
 
 export class MessageType {
@@ -25,4 +25,15 @@ export class BoardDisplay {
 	static PLACING = Symbol('BoardDisplay.PLACING')
 	static NO_SHIPS = Symbol('BoardDisplay.NO_SHIPS')
 	static ACTIVE = Symbol('BoardDisplay.ACTIVE')
+}
+
+export class Result {
+	static SUCCESS = Symbol('Result.SUCCESS')
+	static FAILURE = Symbol('Result.FAILURE')
+}
+
+export class AttackOutcome {
+	static HIT = Symbol('AttackOutcome.HIT')
+	static MISS = Symbol('AttackOutcome.MISS')
+	static UNEXPECTED = Symbol('AttackOutcome.UNEXPECTED')
 }

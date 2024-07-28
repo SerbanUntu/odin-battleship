@@ -72,12 +72,6 @@
 	flex: 1;
 }
 
-.placing.board {
-	.cell:hover {
-		cursor: pointer;
-	}
-}
-
 .active.board {
 	pointer-events: none;
 	user-select: none;

@@ -2,7 +2,7 @@ import { GameStage } from './enums'
 import Player, { ComputerPlayer } from './player'
 import { Carrier, Battleship, Destroyer, Submarine, PatrolBoat } from './ship'
 import { Direction } from './enums'
-import { runInBrowser, runInNode } from './helper'
+import { runInBrowser, runInNode, getRandomCoordinates, getRandomDirection } from './helper'
 import ComponentMessage from '../components/message'
 import ComponentBoard from '../components/board'
 
@@ -19,16 +19,22 @@ export default class Game {
 	static winner = null
 	static turnOf = 1
 
-	static getRandomCoordinates() {
-		let row = Math.floor(Math.random() * 10)
-		let col = Math.floor(Math.random() * 10)
-		return [row, col]
-	}
-
-	static getRandomDirection() {
-		let options = [Direction.EAST, Direction.NORTH, Direction.SOUTH, Direction.WEST]
-		let randomIndex = Math.floor(Math.random() * 4)
-		return options[randomIndex]
+	static reloadForTesting() {
+		runInNode(() => {
+			if (Game.getPlayerOne()) Game.getPlayerOne().gameboard.reset()
+			if (Game.getPlayerTwo()) Game.getPlayerTwo().gameboard.reset()
+			Game.#stage = GameStage.CONFIG
+			Game.#playerOne = null
+			Game.#playerTwo = null
+			Game.#currentlyPlacingPlayer = null
+			Game.againstComputer = null
+			Game.winner = null
+			Game.turnOf = 1
+			dispatchedFirstPlacingFinish = false
+			dispatchedSecondPlacingFinish = false
+			dispatchedGameEnd = false
+		})
+		return true
 	}
 
 	static initWithOverride() {
@@ -53,7 +59,7 @@ export default class Game {
 		} else {
 			Game.#playerTwo = new ComputerPlayer()
 		}
-		Game.#stage = GameStage.SELECTION
+		Game.#stage = GameStage.PLACING
 		Game.#currentlyPlacingPlayer = Game.getPlayerOne()
 		return true
 	}
@@ -76,7 +82,7 @@ export default class Game {
 
 	static placeShip(playerNumber, ship, row, col, direction) {
 		if (Game.#currentlyPlacingPlayer.number !== playerNumber) return false
-		if (Game.#stage !== GameStage.SELECTION) return false
+		if (Game.#stage !== GameStage.PLACING) return false
 		const player = playerNumber === 1 ? Game.getPlayerOne() : Game.getPlayerTwo()
 		if (
 			player.gameboard.ships.filter(
@@ -118,9 +124,10 @@ export default class Game {
 		return result
 	}
 
+	//! Remove on build
 	static autoPlace(forPlayerOne = true, forPlayerTwo = true) {
 		if (
-			Game.#stage !== GameStage.SELECTION ||
+			Game.#stage !== GameStage.PLACING ||
 			(forPlayerOne && Game.getPlayerOne().gameboard.ships.length > 0) ||
 			(forPlayerTwo && Game.getPlayerTwo().gameboard.ships.length > 0)
 		)
@@ -140,7 +147,7 @@ export default class Game {
 
 	static randomPlace(forPlayerOne = true, forPlayerTwo = true) {
 		if (
-			Game.#stage !== GameStage.SELECTION ||
+			Game.#stage !== GameStage.PLACING ||
 			(forPlayerOne && Game.getPlayerOne().gameboard.ships.length > 0) ||
 			(forPlayerTwo && Game.getPlayerTwo().gameboard.ships.length > 0)
 		)
@@ -157,19 +164,9 @@ export default class Game {
 				new PatrolBoat(),
 			]
 			ships.forEach(ship => {
-				let result = Game.placeShip(
-					number,
-					ship,
-					...Game.getRandomCoordinates(),
-					Game.getRandomDirection(),
-				)
+				let result = Game.placeShip(number, ship, ...getRandomCoordinates(), getRandomDirection())
 				while (result !== true) {
-					result = Game.placeShip(
-						number,
-						ship,
-						...Game.getRandomCoordinates(),
-						Game.getRandomDirection(),
-					)
+					result = Game.placeShip(number, ship, ...getRandomCoordinates(), getRandomDirection())
 				}
 			})
 		})
@@ -237,9 +234,9 @@ export default class Game {
 	static attackFromComputer() {
 		if (Game.#stage !== GameStage.BATTLE || !Game.getPlayerTwo().isComputer || Game.turnOf !== 2)
 			return null
-		let result = Game.makeAttack(2, ...Game.getRandomCoordinates())
+		let result = Game.makeAttack(2, ...getRandomCoordinates())
 		while (result === null) {
-			result = Game.makeAttack(2, ...Game.getRandomCoordinates())
+			result = Game.makeAttack(2, ...getRandomCoordinates())
 		}
 		return result
 	}
@@ -248,7 +245,7 @@ export default class Game {
 		if (Game.#stage !== GameStage.FINISHED) return false
 		Game.getPlayerOne().gameboard.reset()
 		Game.getPlayerTwo().gameboard.reset()
-		Game.#stage = GameStage.SELECTION
+		Game.#stage = GameStage.PLACING
 		Game.#currentlyPlacingPlayer = Game.getPlayerOne()
 		Game.turnOf = 1
 		Game.winner = null

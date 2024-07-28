@@ -6,20 +6,6 @@ import { Direction, GameStage } from '../../lib/enums'
 import Game from '../../lib/game'
 import ComponentBoard from '../board'
 
-window.addEventListener('keydown', e => {
-	if (Game.getStage() !== GameStage.SELECTION) return
-	switch (e.key) {
-		case 'r':
-			ShipMenu.rotateCurrentClockwise()
-			break
-		case 'R':
-			if (e.shiftKey) ShipMenu.rotateCurrentCounterClockwise()
-			break
-		case 'q':
-			ShipMenu.removeSelection()
-	}
-})
-
 export default class ShipMenu {
 	static currentShip
 	static currentDirection = Direction.WEST
@@ -31,7 +17,7 @@ export default class ShipMenu {
 
 	static #getNewComponent() {
 		const component = document.createElement('div')
-		component.classList.add('selection-menu')
+		component.classList.add('ship-menu')
 		const ships = [
 			new Carrier(),
 			new Battleship(),
@@ -101,6 +87,9 @@ export default class ShipMenu {
 				break
 			case Direction.EAST:
 				ShipMenu.currentDirection = Direction.SOUTH
+				break
+			default:
+				console.error(`Unexpected direction: ${ShipMenu.currentDirection.toString()}`)
 		}
 		ComponentBoard.updateGhost()
 	}
@@ -118,6 +107,9 @@ export default class ShipMenu {
 				break
 			case Direction.WEST:
 				ShipMenu.currentDirection = Direction.SOUTH
+				break
+			default:
+				console.error(`Unexpected direction: ${ShipMenu.currentDirection.toString()}`)
 		}
 		ComponentBoard.updateGhost()
 	}
@@ -130,3 +122,19 @@ export default class ShipMenu {
 		buttons.forEach(btn => btn.classList.remove('selected'))
 	}
 }
+
+window.addEventListener('keydown', e => {
+	if (Game.getStage() !== GameStage.PLACING) return
+	switch (e.key) {
+		case 'r':
+			ShipMenu.rotateCurrentClockwise()
+			break
+		case 'R':
+			if (e.shiftKey) ShipMenu.rotateCurrentCounterClockwise()
+			break
+		case 'q':
+			ShipMenu.removeSelection()
+			break
+		default:
+	}
+})

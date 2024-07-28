@@ -1,4 +1,3 @@
-import ComponentBoard from '../components/board'
 import { Direction } from './enums'
 import { runInBrowser } from './helper'
 
@@ -27,8 +26,8 @@ export default class Gameboard {
 
 	placeShip(ship, row, col, direction) {
 		if (this.ships.length >= 5) return false
-		let rowIterator = 1
-		let colIterator = 0
+		let rowIterator
+		let colIterator
 		switch (direction) {
 			case Direction.EAST:
 				rowIterator = 0
@@ -42,6 +41,12 @@ export default class Gameboard {
 				rowIterator = 0
 				colIterator = 1
 				break
+			case Direction.NORTH:
+				rowIterator = 1
+				colIterator = 0
+				break
+			default:
+				console.error(`Unexpected direction: ${direction.toString()}`)
 		}
 		let currentCol = col
 		let currentRow = row

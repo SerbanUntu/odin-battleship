@@ -5,7 +5,7 @@ import { BoardDisplay, GameStage } from '../../lib/enums'
 import ComponentShip from '../ship'
 
 import Game from '../../lib/game'
-import ShipMenu from '../ship-selection'
+import ShipMenu from '../ship-menu'
 import Interruption from '../interruption'
 import { directionToClassName, getNewShipObject } from '../../lib/helper'
 
@@ -76,6 +76,9 @@ export default class ComponentBoard {
 				break
 			case BoardDisplay.ACTIVE:
 				this.#domNode.classList.add('active')
+				break
+			default:
+				console.error(`Unexpected display: ${this.#display.toString()}`)
 		}
 	}
 
@@ -86,13 +89,6 @@ export default class ComponentBoard {
 	#getNewComponent() {
 		const component = document.createElement('div')
 		component.classList.add('board')
-		let cellSize = getComputedStyle(document.body).getPropertyValue('--cell-size')
-		cellSize = Number(
-			cellSize
-				.split('')
-				.filter(ch => Number(Number(ch)) === Number(ch))
-				.join(''),
-		) // Keep only numeric characters and convert to Number type
 
 		for (let i = 0; i < Gameboard.size; i++) {
 			for (let j = 0; j < Gameboard.size; j++) {
@@ -104,8 +100,12 @@ export default class ComponentBoard {
 
 				cell.addEventListener('mouseenter', e => {
 					e.preventDefault()
-					if (Game.getStage() !== GameStage.SELECTION) return
-					if (!ShipMenu.currentShip) return
+					if (Game.getStage() !== GameStage.PLACING) return
+					if (!ShipMenu.currentShip) {
+						cell.classList.remove('pointer')
+						return
+					}
+					cell.classList.add('pointer')
 					this.renderShip(ShipMenu.currentShip, i, j, ShipMenu.currentDirection, true)
 				})
 
@@ -121,12 +121,14 @@ export default class ComponentBoard {
 						if (result !== null) {
 							// && !Game.winner
 							if (Game.getPlayerTwo().isComputer) {
+								// 500ms after message finishes streaming
 								setTimeout(() => Game.attackFromComputer(), 500)
 							} else {
+								// 500ms after message finishes streaming
 								setTimeout(() => ComponentBoard.switchBoards(), 1000)
 							}
 						}
-					} else if (Game.getStage() === GameStage.SELECTION) {
+					} else if (Game.getStage() === GameStage.PLACING) {
 						if (!ShipMenu.currentShip) return
 						const result = Game.placeShip(
 							Game.getCurrentlyPlacingPlayer().number,
@@ -152,9 +154,9 @@ export default class ComponentBoard {
 	renderShip(ship, row, col, direction, ghost = false) {
 		const cell = this.#domNode.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`)
 		const shipImage = new ComponentShip(ship, direction).getNewComponent()
+		const ghosts = document.querySelectorAll('.ghost')
+		ghosts.forEach(node => node.remove())
 		if (ghost) {
-			const ghosts = document.querySelectorAll('.ghost')
-			ghosts.forEach(ghost => ghost.remove())
 			shipImage.classList.add('ghost')
 		}
 		cell.appendChild(shipImage)
